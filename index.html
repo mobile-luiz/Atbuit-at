@@ -162,7 +162,7 @@
   }
 
   async function carregarPostes() {
-    const urlDados = "https://script.google.com/macros/s/AKfycbz1l96aDKaVHi_ZtG1-oqdUh_en6hXp6PsZnXo3B4PMQnNUn2_2CwqyBQ8u-FfqVe6woQ/exec";
+    const urlDados = "https://script.google.com/macros/s/AKfycby2bpWYqrSDm8UDGEXmmiYCYSqadSpyJs_GlLwJqxUcPkKRMzPFgYVH4XsmfZ40yYGqlA/exec";
     const usuarioLogado = (localStorage.getItem("usuarioLogado") || "").trim().toLowerCase();
     const perfilLogado = (localStorage.getItem("perfilLogado") || "").trim().toLowerCase();
 
@@ -223,41 +223,51 @@
 
 
 
-
   <script>
-    const urlScript = "https://script.google.com/macros/s/AKfycbzulwbYoaITgX4AYmd1ySvbFJOwP6-D83ASEjKsVRsGVc8ppyBxZwAcDb_OorPM2yAK3A/exec";
+    const urlScript = "https://script.google.com/macros/s/AKfycbwQRVLB8u3nQVm192ovbOtYqBli_fbJ0stqYwfxiuF4dSTRWF_9vQme-dKkzhNUTYVr7g/exec";
     let todosOsPostes = [];
     let paginaAtual = 1;
-    const itensPorPagina = 20;
+    const itensPorPagina = 50;
     let map;
     let markers = [];
 
-    async function carregarPostes() {
-      const usuario = document.getElementById("usuario").value.trim();
-      const url = usuario ? `${urlScript}?usuario=${encodeURIComponent(usuario)}` : urlScript;
+   async function carregarPostes() {
+  const usuario = document.getElementById("usuario").value.trim();
+  const url = usuario ? `${urlScript}?usuario=${encodeURIComponent(usuario)}` : urlScript;
 
-      try {
-        const resposta = await fetch(url);
-        const json = await resposta.json();
-        let dados = json.dados;
+  try {
+    const resposta = await fetch(url);
+    const json = await resposta.json();
+    let dados = json.dados;
 
-        dados = dados.map(p => {
-          const partes = p.dataLancamento ? p.dataLancamento.split(" ")[0].split("/") : null;
-          if (partes && partes.length === 3) {
-            p._dataConvertida = new Date(`${partes[2]}-${partes[1]}-${partes[0]}T00:00:00`);
-          } else {
-            p._dataConvertida = null;
-          }
-          return p;
-        });
-
-        todosOsPostes = dados;
-        popularFiltroProjetos(dados);
-        filtrarPostes();
-      } catch (err) {
-        alert("Erro ao carregar dados: " + err.message);
+    // Converte a dataLancamento para Date real
+    dados = dados.map(p => {
+      if (p.dataLancamento) {
+        const partes = p.dataLancamento.split(/[\s/:]+/);
+        if (partes.length >= 5) {
+          const [dia, mes, ano, hora, minuto, segundo] = partes.map(Number);
+          p._dataConvertida = new Date(ano, mes - 1, dia, hora, minuto, segundo || 0);
+        } else {
+          p._dataConvertida = null;
+        }
+      } else {
+        p._dataConvertida = null;
       }
-    }
+      return p;
+    });
+
+    // ⚠️ Aqui já ordena em ordem decrescente (mais novo primeiro)
+    dados.sort((a, b) => (b._dataConvertida || 0) - (a._dataConvertida || 0));
+
+    todosOsPostes = dados;
+    popularFiltroProjetos(dados);
+    paginaAtual = 1; // ✅ Sempre volta para a primeira página nos novos carregamentos
+    filtrarPostes();
+  } catch (err) {
+    alert("Erro ao carregar dados: " + err.message);
+  }
+}
+
 
     function popularFiltroProjetos(lista) {
       const select = document.getElementById("filtroProjeto");
@@ -274,36 +284,37 @@
     function normalizarTexto(texto) {
       return (texto || "").trim().toLowerCase();
     }
+function filtrarPostes() {
+  const filtroProjeto = normalizarTexto(document.getElementById("filtroProjeto")?.value);
+  const filtroPoste = normalizarTexto(document.getElementById("filtroPoste")?.value);
+  const filtroUsuario = normalizarTexto(document.getElementById("usuario")?.value);
+  const dataInicial = document.getElementById("dataInicial").value;
+  const dataFinal = document.getElementById("dataFinal").value;
 
-    function filtrarPostes() {
-      const filtroProjeto = normalizarTexto(document.getElementById("filtroProjeto")?.value);
-      const filtroPoste = normalizarTexto(document.getElementById("filtroPoste")?.value);
-      const filtroUsuario = normalizarTexto(document.getElementById("usuario")?.value);
-      const dataInicial = document.getElementById("dataInicial").value;
-      const dataFinal = document.getElementById("dataFinal").value;
+  let listaFiltrada = todosOsPostes.filter(p => {
+    const data = p._dataConvertida;
+    return (
+      (!filtroProjeto || normalizarTexto(p.idProjeto) === filtroProjeto) &&
+      (!filtroPoste || normalizarTexto(p.codigoPoste).includes(filtroPoste)) &&
+      (!filtroUsuario || normalizarTexto(p.usuario).includes(filtroUsuario)) &&
+      (!dataInicial || (data && data >= new Date(`${dataInicial}T00:00:00`))) &&
+      (!dataFinal || (data && data <= new Date(`${dataFinal}T23:59:59`)))
+    );
+  });
 
-      let listaFiltrada = todosOsPostes.filter(p => {
-        const data = p._dataConvertida;
-        return (
-          (!filtroProjeto || normalizarTexto(p.idProjeto) === filtroProjeto) &&
-          (!filtroPoste || normalizarTexto(p.codigoPoste).includes(filtroPoste)) &&
-          (!filtroUsuario || normalizarTexto(p.usuario).includes(filtroUsuario)) &&
-          (!dataInicial || (data && data >= new Date(`${dataInicial}T00:00:00`))) &&
-          (!dataFinal || (data && data <= new Date(`${dataFinal}T23:59:59`)))
-        );
-      });
+  // ⚠️ Importante: a filtragem mantém a ordem decrescente sem reordenar todosOsPostes
+  listaFiltrada.sort((a, b) => (b._dataConvertida || 0) - (a._dataConvertida || 0));
 
-      listaFiltrada.sort((a, b) => (b._dataConvertida || 0) - (a._dataConvertida || 0));
+  const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
+  const inicio = (paginaAtual - 1) * itensPorPagina;
+  const fim = inicio + itensPorPagina;
+  const listaPaginada = listaFiltrada.slice(inicio, fim);
 
-      const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
-      const inicio = (paginaAtual - 1) * itensPorPagina;
-      const fim = inicio + itensPorPagina;
-      const listaPaginada = listaFiltrada.slice(inicio, fim);
+  exibirPostes(listaPaginada);
+  mostrarMapa(listaPaginada);
+  atualizarPaginacao(totalPaginas);
+}
 
-      exibirPostes(listaPaginada);
-      mostrarMapa(listaPaginada);
-      atualizarPaginacao(totalPaginas);
-    }
 
     function atualizarPaginacao(totalPaginas) {
       const pagDiv = document.getElementById("paginacao");
@@ -411,23 +422,24 @@ async function salvar(tr) {
   botaoSalvar.disabled = true;
   botaoSalvar.textContent = 'Salvando...';
 
-  const dados = {
-    idProjeto: tr.children[1].querySelector("input").value,
-    codigoPoste: tr.children[2].querySelector("input").value,
-    estruturaPrimaria: tr.children[3].querySelector("input").value,
-    postePrimario: tr.children[4].querySelector("input").value,
-    posteSecundario: tr.children[5].querySelector("input").value,
-    estruturaSecundaria: tr.children[6].querySelector("input").value,
-    linhaViva: tr.children[7].querySelector("input").value,
-    observacoes: tr.children[8].querySelector("textarea").value,
-    caminhoFoto: corrigirImagemURL(tr.children[9].querySelector("a")?.href || ""),
-    caminhoFoto2: corrigirImagemURL(tr.children[10].querySelector("a")?.href || ""),
-    caminhoFoto3: corrigirImagemURL(tr.children[11].querySelector("a")?.href || ""),
-    latitude: tr.children[12].querySelector("input").value,
-    longitude: tr.children[13].querySelector("input").value,
-    usuario: tr.children[14].querySelector("input").value,
-    status: tr.children[15].querySelector("select").value
-  };
+const dados = {
+  dataLancamento: tr.children[0]?.querySelector("span")?.innerText || "",
+  idProjeto: tr.children[1].querySelector("input").value,
+  codigoPoste: tr.children[2].querySelector("input").value,
+  estruturaPrimaria: tr.children[3].querySelector("input").value,
+  postePrimario: tr.children[4].querySelector("input").value,
+  posteSecundario: tr.children[5].querySelector("input").value,
+  estruturaSecundaria: tr.children[6].querySelector("input").value,
+  linhaViva: tr.children[7].querySelector("input").value,
+  observacoes: tr.children[8].querySelector("textarea").value,
+  caminhoFoto: corrigirImagemURL(tr.children[9].querySelector("a")?.href || ""),
+  caminhoFoto2: corrigirImagemURL(tr.children[10].querySelector("a")?.href || ""),
+  caminhoFoto3: corrigirImagemURL(tr.children[11].querySelector("a")?.href || ""),
+  latitude: tr.children[12].querySelector("input").value,
+  longitude: tr.children[13].querySelector("input").value,
+  usuario: tr.children[14].querySelector("input").value,
+  status: tr.children[15].querySelector("select").value
+};
 
   try {
     const resposta = await fetch(urlScript, {
@@ -675,7 +687,24 @@ async function verificarAtualizacoes() {
 
     if (novaVersao !== ultimaVersaoDados) {
       ultimaVersaoDados = novaVersao;
-      todosOsPostes = json.dados;
+
+      // ✅ Recalcula data e reordena em ordem decrescente
+      todosOsPostes = json.dados.map(p => {
+        if (p.dataLancamento) {
+          const partes = p.dataLancamento.split(/[\s/:]+/);
+          if (partes.length >= 5) {
+            const [dia, mes, ano, hora, minuto, segundo] = partes.map(Number);
+            p._dataConvertida = new Date(ano, mes - 1, dia, hora, minuto, segundo || 0);
+          } else {
+            p._dataConvertida = null;
+          }
+        } else {
+          p._dataConvertida = null;
+        }
+        return p;
+      }).sort((a, b) => (b._dataConvertida || 0) - (a._dataConvertida || 0));
+
+      // ✅ Mantém a páginaAtual que já está setada
       filtrarPostes();
       mostrarAvisoAtualizacao();
     }
@@ -683,6 +712,7 @@ async function verificarAtualizacoes() {
     console.error("❌ Erro ao verificar atualizações:", error);
   }
 }
+
 
 
 function mostrarAvisoAtualizacao() {
