@@ -85,7 +85,7 @@
             <th>Estrutura Secundária</th>
             <th>Linha Viva</th> <!-- ✅ Novo -->
             <th>Observações</th>
-            <th>Imagem</th>
+            <th>Imagem 1</th>
             <th>Imagem 2</th>
             <th>Imagem 3</th>
             <th>Latitude</th>
@@ -361,7 +361,7 @@ function filtrarPostes() {
       <td><input type="text" value="${p.postePrimario || ''}" disabled></td>
       <td><input type="text" value="${p.posteSecundario || ''}" disabled></td>
       <td><input type="text" value="${p.estruturaSecundaria || ''}" disabled></td>
-      <td><input type="text" value="${p.linhaViva || ''}" disabled></td> <!-- ✅ AQUI -->
+      <td><textarea disabled>${p.linhaViva || ''}</textarea></td> <!-- ✅ ALTERADO -->
       <td><textarea disabled>${p.observacoes || ''}</textarea></td>
       <td><a href="${p.caminhoFoto}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto)}" alt="Foto"></a></td>
       <td><a href="${p.caminhoFoto2}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto2)}" alt="Foto2"></a></td>
