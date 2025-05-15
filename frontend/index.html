@@ -567,49 +567,40 @@ function corrigirImagemURL(url) {
 
 const info = new google.maps.InfoWindow({
   content: `
-    <div style="max-width: 300px; font-family: sans-serif; font-size: 13px;">
-      <div style="font-weight: bold; font-size: 15px; margin-bottom: 6px;">Projeto: ${p.idProjeto || ''}</div>
-      <div style="margin-bottom: 10px; color: #555;">PG: ${p.codigoPoste || ''}</div>
-
-      <b>Data:</b> ${p.dataLancamento || ''}<br>
-      <b>Estrutura Primária:</b> ${p.estruturaPrimaria || ''}<br>
-      <b>Poste Primário:</b> ${p.postePrimario || ''}<br>
-      <b>Poste Secundário:</b> ${p.posteSecundario || ''}<br>
-      <b>Estrutura Secundária:</b> ${p.estruturaSecundaria || ''}<br>
-      <b>Linha Viva:</b> ${p.linhaViva || ''}<br>
-      <b>Latitude:</b> ${p.latitude || ''}<br>
-      <b>Longitude:</b> ${p.longitude || ''}<br>
-      <b>Status:</b> ${p.status || 'Em andamento'}<br>
-      <b>Usuário:</b> ${p.usuario || ''}<br>
-      <b>Observações:</b> ${p.observacoes || ''}<br>
-
-      <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
-        ${p.caminhoFoto ? `
-          <a href="${corrigirImagemURL(p.caminhoFoto)}" target="_blank">
-            <img src="${corrigirImagemURL(p.caminhoFoto)}" style="width: 90px; height: 90px; border-radius: 6px; border: 1px solid #ccc; object-fit: cover; cursor: pointer;" onerror='this.src="no-image.png"'>
-          </a>` : ''}
-
-        ${p.caminhoFoto2 ? `
-          <a href="${corrigirImagemURL(p.caminhoFoto2)}" target="_blank">
-            <img src="${corrigirImagemURL(p.caminhoFoto2)}" style="width: 90px; height: 90px; border-radius: 6px; border: 1px solid #ccc; object-fit: cover; cursor: pointer;" onerror='this.src="no-image.png"'>
-          </a>` : ''}
-
-        ${p.caminhoFoto3 ? `
-          <a href="${corrigirImagemURL(p.caminhoFoto3)}" target="_blank">
-            <img src="${corrigirImagemURL(p.caminhoFoto3)}" style="width: 90px; height: 90px; border-radius: 6px; border: 1px solid #ccc; object-fit: cover; cursor: pointer;" onerror='this.src="no-image.png"'>
-          </a>` : ''}
+    <div style="max-width: 320px; font-family: 'Roboto', sans-serif; font-size: 13px; color: #333;">
+      <div style="border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 8px;">
+        <div style="color: #1976d2; font-weight: bold; font-size: 16px;">📁 Projeto: ${p.idProjeto || 'Sem Projeto'}</div>
+        <div style="color: #666; font-size: 13px;">🔖 PG: ${p.codigoPoste || '-'}</div>
+      </div>
+      <div style="line-height: 1.5;">
+        📅 <b>Data:</b> ${p.dataLancamento || '-'}<br>
+        🏗️ <b>Estrutura Primária:</b> ${p.estruturaPrimaria || '-'}<br>
+        📍 <b>Poste Primário:</b> ${p.postePrimario || '-'}<br>
+        🔗 <b>Poste Secundário:</b> ${p.posteSecundario || '-'}<br>
+        ⚙️ <b>Estrutura Secundária:</b> ${p.estruturaSecundaria || '-'}<br>
+        ⚡ <b>Linha Viva:</b> ${p.linhaViva || '-'}<br>
+        🌍 <b>Localização:</b> ${p.latitude || '-'}, ${p.longitude || '-'}<br>
+        🔎 <b>Status:</b> <span style="color:${p.status === 'Concluído' ? 'green' : 'orange'};">${p.status || 'Em andamento'}</span><br>
+        👤 <b>Usuário:</b> ${p.usuario || '-'}<br>
+        📝 <b>Obs:</b> ${p.observacoes || '-'}
       </div>
 
       ${(p.caminhoFoto || p.caminhoFoto2 || p.caminhoFoto3) ? `
+        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+          ${p.caminhoFoto ? `<a href="${corrigirImagemURL(p.caminhoFoto)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
+          ${p.caminhoFoto2 ? `<a href="${corrigirImagemURL(p.caminhoFoto2)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto2)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
+          ${p.caminhoFoto3 ? `<a href="${corrigirImagemURL(p.caminhoFoto3)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto3)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
+        </div>
         <div style="margin-top: 10px; text-align: center;">
           <button onclick="abrirTabelaCompleta('${corrigirImagemURL(p.caminhoFoto)}', '${corrigirImagemURL(p.caminhoFoto2)}', '${corrigirImagemURL(p.caminhoFoto3)}')" style="background: #1976d2; color: white; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer;">
-            🔍 Ver Tabela Completa
+            🔍 Ver Imagens
           </button>
         </div>
       ` : ''}
     </div>
   `
 });
+
 
 
 window.abrirTabelaCompleta = function (foto1, foto2, foto3) {
@@ -634,6 +625,8 @@ window.abrirTabelaCompleta = function (foto1, foto2, foto3) {
   novaJanela.document.write(html);
   novaJanela.document.close();
 };
+
+
 
 // ✅ Função para corrigir URL do Google Drive
 function corrigirImagemURL(url) {
