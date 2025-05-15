@@ -567,39 +567,43 @@ function corrigirImagemURL(url) {
 
 const info = new google.maps.InfoWindow({
   content: `
-    <div style="max-width: 320px; font-family: 'Roboto', sans-serif; font-size: 13px; color: #333;">
-      <div style="border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 8px;">
-        <div style="color: #1976d2; font-weight: bold; font-size: 16px;">📁 Projeto: ${p.idProjeto || 'Sem Projeto'}</div>
-        <div style="color: #666; font-size: 13px;">🔖 PG: ${p.codigoPoste || '-'}</div>
+    <div style="max-width: 320px; font-family: 'Roboto', sans-serif; color: #333; border-radius: 12px; overflow: hidden;">
+      <div style="background: #1976d2; color: #fff; padding: 12px 16px;">
+        <div style="font-size: 16px; font-weight: bold;">📁 Projeto: ${p.idProjeto || 'N/A'}</div>
+        <div style="font-size: 13px; opacity: 0.9;">🔖 PG: ${p.codigoPoste || '-'}</div>
       </div>
-      <div style="line-height: 1.5;">
-        📅 <b>Data:</b> ${p.dataLancamento || '-'}<br>
-        🏗️ <b>Estrutura Primária:</b> ${p.estruturaPrimaria || '-'}<br>
-        📍 <b>Poste Primário:</b> ${p.postePrimario || '-'}<br>
-        🔗 <b>Poste Secundário:</b> ${p.posteSecundario || '-'}<br>
-        ⚙️ <b>Estrutura Secundária:</b> ${p.estruturaSecundaria || '-'}<br>
-        ⚡ <b>Linha Viva:</b> ${p.linhaViva || '-'}<br>
-        🌍 <b>Localização:</b> ${p.latitude || '-'}, ${p.longitude || '-'}<br>
-        🔎 <b>Status:</b> <span style="color:${p.status === 'Concluído' ? 'green' : 'orange'};">${p.status || 'Em andamento'}</span><br>
-        👤 <b>Usuário:</b> ${p.usuario || '-'}<br>
-        📝 <b>Obs:</b> ${p.observacoes || '-'}
+
+      <div style="padding: 12px 16px; background: #f9f9f9;">
+        <div style="margin-bottom: 6px;">📅 <b>Data:</b> ${p.dataLancamento || '-'}</div>
+        <div style="margin-bottom: 6px;">🏗️ <b>Estrutura Primária:</b> ${p.estruturaPrimaria || '-'}</div>
+        <div style="margin-bottom: 6px;">📍 <b>Poste Primário:</b> ${p.postePrimario || '-'}</div>
+        <div style="margin-bottom: 6px;">🔗 <b>Poste Secundário:</b> ${p.posteSecundario || '-'}</div>
+        <div style="margin-bottom: 6px;">⚙️ <b>Estrutura Secundária:</b> ${p.estruturaSecundaria || '-'}</div>
+        <div style="margin-bottom: 6px;">⚡ <b>Linha Viva:</b> ${p.linhaViva || '-'}</div>
+        <div style="margin-bottom: 6px;">📡 <b>Localização:</b> ${p.latitude || '-'}, ${p.longitude || '-'}</div>
+        <div style="margin-bottom: 6px;">🟢 <b>Status:</b> <span style="color:${p.status === 'Concluído' ? 'green' : 'orange'};">${p.status || 'Em andamento'}</span></div>
+        <div style="margin-bottom: 6px;">👤 <b>Usuário:</b> ${p.usuario || '-'}</div>
+        <div style="margin-bottom: 0;">📝 <b>Observações:</b> ${p.observacoes || '-'}</div>
       </div>
 
       ${(p.caminhoFoto || p.caminhoFoto2 || p.caminhoFoto3) ? `
-        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-          ${p.caminhoFoto ? `<a href="${corrigirImagemURL(p.caminhoFoto)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
-          ${p.caminhoFoto2 ? `<a href="${corrigirImagemURL(p.caminhoFoto2)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto2)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
-          ${p.caminhoFoto3 ? `<a href="${corrigirImagemURL(p.caminhoFoto3)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto3)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
-        </div>
-        <div style="margin-top: 10px; text-align: center;">
-          <button onclick="abrirTabelaCompleta('${corrigirImagemURL(p.caminhoFoto)}', '${corrigirImagemURL(p.caminhoFoto2)}', '${corrigirImagemURL(p.caminhoFoto3)}')" style="background: #1976d2; color: white; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer;">
-            🔍 Ver Imagens
-          </button>
+        <div style="padding: 12px 16px; background: #fff;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+            ${p.caminhoFoto ? `<a href="${corrigirImagemURL(p.caminhoFoto)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
+            ${p.caminhoFoto2 ? `<a href="${corrigirImagemURL(p.caminhoFoto2)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto2)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
+            ${p.caminhoFoto3 ? `<a href="${corrigirImagemURL(p.caminhoFoto3)}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto3)}" style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;" onerror='this.src="no-image.png"'></a>` : ''}
+          </div>
+          <div style="margin-top: 10px; text-align: center;">
+            <button onclick="abrirTabelaCompleta('${corrigirImagemURL(p.caminhoFoto)}', '${corrigirImagemURL(p.caminhoFoto2)}', '${corrigirImagemURL(p.caminhoFoto3)}')" style="background: #1976d2; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer;">
+              🔍 Ver Imagens
+            </button>
+          </div>
         </div>
       ` : ''}
     </div>
   `
 });
+
 
 
 
