@@ -297,6 +297,133 @@ body {
 }
 
 
+/* ======== GLOBAL MAP STYLE ======== */
+#map {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+}
+
+/* ======== BOTÕES DE CONTROLE DO MAPA ======== */
+.gm-control-active, .gm-fullscreen-control, .gm-svpc {
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid #ccc !important;
+}
+
+/* ======== HOVER DOS BOTÕES ======== */
+.gm-control-active:hover {
+  background: #e0f2f1 !important;
+  border-color: #26a69a !important;
+}
+
+/* ======== BOTÃO ZOOM & TIPO DE MAPA ======== */
+.gm-style .gm-style-mtc {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 13px !important;
+  background: #ffffff !important;
+  border: 1px solid #cccccc !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.gm-style .gm-style-mtc div {
+  padding: 6px 12px !important;
+  color: #004d40 !important;
+}
+
+.gm-style .gm-style-mtc div:hover {
+  background: #e0f7fa !important;
+  color: #00695c !important;
+}
+
+/* ======== SCROLLBAR ======== */
+.scroll-table {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #004d40 #e0e0e0;
+}
+
+.scroll-table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-table::-webkit-scrollbar-thumb {
+  background: #004d40;
+  border-radius: 8px;
+}
+
+.scroll-table::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+/* ======== TABELA DE POSTES ======== */
+#tabelaPostes th {
+  background: #004d40;
+  color: white;
+  padding: 10px;
+  font-weight: 500;
+  font-size: 13px;
+  text-align: center;
+}
+
+#tabelaPostes td {
+  font-size: 12px;
+  padding: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* ======== PAGINAÇÃO ======== */
+#paginacao button {
+  background: #ffffff;
+  border: 1px solid #004d40;
+  color: #004d40;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#paginacao button:hover {
+  background: #004d40;
+  color: white;
+}
+
+/* ======== CONTADOR STATUS ======== */
+#contadorStatus {
+  background: #e0f2f1;
+  color: #004d40;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+#tabelaPostes thead th {
+  background-color: #f5f5f5; /* Fundo cinza claro */
+  color: #333333 !important; /* Texto cinza escuro */
+  padding: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  border-bottom: 1px solid #cccccc;
+}
+
+
+
+#tabelaPostes {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#tabelaPostes td, #tabelaPostes th {
+  border: 1px solid #e0e0e0;
+}
+
 
 
 
