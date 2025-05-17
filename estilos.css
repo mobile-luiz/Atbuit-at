@@ -1,5 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+/* ====== FONTES ====== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&family=Roboto:wght@400;500;700&display=swap');
 
+/* ====== BASE GLOBAL ====== */
 * {
   box-sizing: border-box;
   font-family: 'Roboto', sans-serif;
@@ -13,6 +15,7 @@ body {
   color: #2d3748;
 }
 
+/* ====== CONTAINER PRINCIPAL ====== */
 .container {
   max-width: 1800px;
   margin: auto;
@@ -24,11 +27,13 @@ body {
   animation: fadeIn 0.4s ease;
 }
 
+/* ====== ANIMAÇÕES ====== */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ====== TÍTULOS ====== */
 h2 {
   font-size: 22px;
   font-weight: 600;
@@ -45,6 +50,7 @@ h3 {
   margin: 20px 0 12px;
 }
 
+/* ====== HEADER DE FILTROS ====== */
 .header {
   display: flex;
   flex-wrap: wrap;
@@ -73,8 +79,8 @@ select {
   border-radius: 8px;
   background: #ffffff;
   font-size: 14px;
-  transition: 0.2s;
   min-width: 160px;
+  transition: 0.2s;
 }
 
 input:focus,
@@ -84,6 +90,7 @@ select:focus {
   outline: none;
 }
 
+/* ====== BOTÕES ====== */
 button {
   background: #3b82f6;
   color: white;
@@ -99,22 +106,41 @@ button:hover {
   background: #2563eb;
 }
 
+/* ====== CONTADOR DE STATUS ====== */
 #contadorStatus {
-  font-size: 14px;
+  background: #e0f2f1;
+  color: #004d40;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 18px 0 10px;
   font-weight: 500;
-  margin: 18px 0;
-  color: #475569;
   display: flex;
-  align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
+/* ====== TABELA ====== */
 .scroll-table {
   overflow-x: auto;
   max-height: 500px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
+  scrollbar-width: thin;
+  scrollbar-color: #004d40 #e0e0e0;
+}
+
+.scroll-table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-table::-webkit-scrollbar-thumb {
+  background: #004d40;
+  border-radius: 8px;
+}
+
+.scroll-table::-webkit-scrollbar-track {
+  background: #f5f5f5;
 }
 
 table {
@@ -124,12 +150,15 @@ table {
 }
 
 thead th {
-  background: #f9fafb;
-  font-weight: 600;
+  background: #004d40;
+  color: white;
   padding: 12px;
+  font-weight: 600;
+  text-align: center;
   border-bottom: 1px solid #e5e7eb;
-  color: #334155;
-  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 tbody td {
@@ -144,6 +173,15 @@ tbody tr:hover {
   background: #f0f9ff;
 }
 
+td input {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  padding: 4px 6px;
+  width: 100%;
+  font-size: 13px;
+}
+
+/* ====== IMAGENS NA TABELA ====== */
 img {
   height: 36px;
   width: 36px;
@@ -152,6 +190,13 @@ img {
   border: 1px solid #e5e7eb;
 }
 
+td i {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* ====== CAMPOS DESABILITADOS ====== */
 input[readonly],
 input[disabled],
 select[disabled] {
@@ -162,21 +207,50 @@ select[disabled] {
   padding-left: 0;
 }
 
-td i {
-  color: #9ca3af;
-  font-style: italic;
-  font-size: 12px;
-}
-
+/* ====== MAPA ====== */
 #map {
   width: 100%;
   height: 400px;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Barras (Superior e Inferior) */
+/* Estilo dos botões de controle do Google Maps */
+.gm-control-active,
+.gm-fullscreen-control,
+.gm-svpc {
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid #ccc !important;
+}
+
+.gm-control-active:hover {
+  background: #e0f2f1 !important;
+  border-color: #26a69a !important;
+}
+
+.gm-style .gm-style-mtc {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 13px !important;
+  background: #ffffff !important;
+  border: 1px solid #cccccc !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.gm-style .gm-style-mtc div {
+  padding: 6px 12px !important;
+  color: #004d40 !important;
+}
+
+.gm-style .gm-style-mtc div:hover {
+  background: #e0f7fa !important;
+  color: #00695c !important;
+}
+
+/* ====== BARRAS DE STATUS (SUPERIOR E INFERIOR) ====== */
 .barra-container {
   width: 100%;
   margin-bottom: 16px;
@@ -212,17 +286,14 @@ td i {
   border-radius: 6px;
 }
 
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: #f5f6fa;
-}
-
+/* ====== LOGIN ====== */
 #loginContainer {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: #f5f6fa;
 }
 
 .login-box {
@@ -230,7 +301,6 @@ body {
   padding: 40px 32px;
   border-radius: 16px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-  width: 100%;
   max-width: 400px;
   text-align: center;
 }
@@ -288,93 +358,7 @@ body {
   margin-top: 20px;
 }
 
-#tabelaPostes thead th {
-  position: sticky;
-  top: 0;
-  background-color: #f9f9f9; /* Cor de fundo do cabeçalho */
-  z-index: 10;
-  border-bottom: 1px solid #ddd;
-}
-
-
-/* ======== GLOBAL MAP STYLE ======== */
-#map {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e0e0e0;
-}
-
-/* ======== BOTÕES DE CONTROLE DO MAPA ======== */
-.gm-control-active, .gm-fullscreen-control, .gm-svpc {
-  border-radius: 8px !important;
-  background: #ffffff !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-  border: 1px solid #ccc !important;
-}
-
-/* ======== HOVER DOS BOTÕES ======== */
-.gm-control-active:hover {
-  background: #e0f2f1 !important;
-  border-color: #26a69a !important;
-}
-
-/* ======== BOTÃO ZOOM & TIPO DE MAPA ======== */
-.gm-style .gm-style-mtc {
-  font-family: 'Roboto', sans-serif !important;
-  font-size: 13px !important;
-  background: #ffffff !important;
-  border: 1px solid #cccccc !important;
-  border-radius: 8px !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-}
-
-.gm-style .gm-style-mtc div {
-  padding: 6px 12px !important;
-  color: #004d40 !important;
-}
-
-.gm-style .gm-style-mtc div:hover {
-  background: #e0f7fa !important;
-  color: #00695c !important;
-}
-
-/* ======== SCROLLBAR ======== */
-.scroll-table {
-  overflow-x: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #004d40 #e0e0e0;
-}
-
-.scroll-table::-webkit-scrollbar {
-  height: 8px;
-}
-
-.scroll-table::-webkit-scrollbar-thumb {
-  background: #004d40;
-  border-radius: 8px;
-}
-
-.scroll-table::-webkit-scrollbar-track {
-  background: #f5f5f5;
-}
-
-/* ======== TABELA DE POSTES ======== */
-#tabelaPostes th {
-  background: #004d40;
-  color: white;
-  padding: 10px;
-  font-weight: 500;
-  font-size: 13px;
-  text-align: center;
-}
-
-#tabelaPostes td {
-  font-size: 12px;
-  padding: 8px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-/* ======== PAGINAÇÃO ======== */
+/* ====== PAGINAÇÃO ====== */
 #paginacao button {
   background: #ffffff;
   border: 1px solid #004d40;
@@ -391,45 +375,51 @@ body {
   color: white;
 }
 
-/* ======== CONTADOR STATUS ======== */
-#contadorStatus {
-  background: #e0f2f1;
-  color: #004d40;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-bottom: 10px;
-  font-weight: 500;
-  display: inline-block;
-}
-
-#tabelaPostes thead th {
-  background-color: #f5f5f5; /* Fundo cinza claro */
-  color: #333333 !important; /* Texto cinza escuro */
-  padding: 10px;
-  font-weight: 600;
-  font-size: 13px;
-  text-align: center;
-  border-bottom: 1px solid #cccccc;
-}
-
-td input {
-  border: none;
-  border-bottom: 1px solid #ccc;
-  border-radius: 0;
-  padding: 4px 6px;
-  width: 100%;
-  font-size: 13px;
-}
-
-
-
-
-
+/* ====== RESPONSIVO (CELULAR E TABLET) ====== */
 @media (max-width: 1024px) {
   td:nth-child(8), th:nth-child(8),
   td:nth-child(10), th:nth-child(10),
   td:nth-child(11), th:nth-child(11) {
     display: none;
   }
+
+  .header {
+    flex-direction: column;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+
+  /* ====== BARRA DE PROGRESSO NO CABEÇALHO ====== */
+.barra-progresso-header {
+  width: 100%;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  margin: 20px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.barra-progresso-header .progresso {
+  width: 75%; /* Altere este valor conforme o progresso atual (ex: 25%, 50%, 90%) */
+  height: 100%;
+  background-color: #004d40; /* Verde escuro */
+  border-radius: 8px;
+  transition: width 0.4s ease-in-out;
+}
+
+.logo {
+  height: 100px;
+  width: 100px; /* aumenta para o lado */
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+
+
+
+
 }

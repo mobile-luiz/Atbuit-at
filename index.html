@@ -9,6 +9,7 @@
 <body>
 
 
+
 <!-- Tela de Login -->
 <div id="loginContainer" class="login-container">
   <div class="login-box">
@@ -17,8 +18,16 @@
     <input type="password" id="loginSenha" placeholder="Senha">
     <button onclick="fazerLogin()">Entrar</button>
     <div id="loginErro" class="login-erro"></div>
+
+    <!-- 🔽 Nome do sistema e logo abaixo do botão -->
+    <div style="margin-top: 30px; display: flex; flex-direction: column; align-items: center;">
+      <img src="logo-atbuilt.png" alt="Logo Atbuilt" style="height: 50px; margin-bottom: 8px;">
+      <h3 style="margin: 0; font-size: 16px; color: #1a202c;">Atbuilt - Sistema de Gestão </h3>
+    </div>
   </div>
 </div>
+
+
 
 <!-- Tela do Sistema (oculta até login) -->
 <div id="sistemaContainer" class="sistema-container" style="display: none;">
@@ -132,8 +141,9 @@
       </table>
     </div>
 
-    <h3>Mapa dos Postes</h3>
-    <div id="map" style="width: 100%; height: 400px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+   <h3>📍 Mapa dos Postes</h3>
+<div id="map" style="width: 100%; height: 400px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+
   </div>
 
 <script>
@@ -924,7 +934,6 @@ async function verificarAtualizacoes() {
 }
 
 
-
 function mostrarAvisoAtualizacao() {
   let aviso = document.getElementById("avisoAtualizacao");
 
@@ -987,7 +996,6 @@ btnMostrarPodas.addEventListener("click", () => {
     btnMostrarPodas.style.backgroundColor = "#388E3C"; // Verde
   }
 });
-
 
 
    // window.onload = () => carregarPostes();
