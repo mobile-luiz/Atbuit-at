@@ -71,7 +71,8 @@
 
     <div style="margin-bottom: 12px;">
      
-    
+  <!-- 📦 Barra de botões -->
+<div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 6px;">
   <button onclick="exportarCSV(false)">📥 Baixar Página</button>
   <button onclick="exportarCSV(true)">📥 Baixar Tudo</button>
   
@@ -83,13 +84,22 @@
 </div>
 
 
+  <div id="contadorStatus" style="
+    margin-top: 6px;
+    background: #d1f0ea;
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: #064e3b;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    max-width: 100%;
+    overflow: hidden;
+  "></div>
+</section>
 
-    </div>
 
-    <div id="contadorStatus"></div>
     <div id="paginacao" style="margin: 12px 0;"></div>
-
-  
 
     <div class="scroll-table">
       <div class="barra-container">
@@ -100,8 +110,8 @@
             <th>Data/Hora</th>
             <th>ID Projeto</th>
             <th>PG</th>
-            <th>Estrutura Primária</th>
             <th>Poste Primário</th>
+            <th>Estrutura Primária</th>
             <th>Poste Secundário</th>
             <th>Estrutura Secundária</th>
             <th>Linha Viva</th> <!-- ✅ Novo -->
@@ -184,7 +194,7 @@
   }
 
   async function carregarPostes() {
-    const urlDados = "https://script.google.com/macros/s/AKfycbw15mtbx4dLzZoRTwgpDSIJ02_UnBV49ylC3cGUJBO43WrK6gmZkBiHNRWNcqampi4V1A/exec";
+    const urlDados = "https://script.google.com/macros/s/AKfycbyldggQ00mt1ilNqf3MZ16YmqTd9eYuWEeZsHjLllXa18iHt0Gd6QKf9SfBaXfGqwqyZA/exec";
     const usuarioLogado = (localStorage.getItem("usuarioLogado") || "").trim().toLowerCase();
     const perfilLogado = (localStorage.getItem("perfilLogado") || "").trim().toLowerCase();
 
@@ -215,8 +225,8 @@
         <td>${p.dataHora || ""}</td>
         <td>${p.idProjeto || ""}</td>
         <td>${p.codigoPoste || ""}</td>
-        <td>${p.estruturaPrimaria || ""}</td>
         <td>${p.postePrimario || ""}</td>
+        <td>${p.estruturaPrimaria || ""}</td>
         <td>${p.posteSecundario || ""}</td>
         <td>${p.estruturaSecundaria || ""}</td>
         <td>${p.linhaViva || ""}</td>
@@ -246,7 +256,7 @@
 
 
   <script>
-    const urlScript = "https://script.google.com/macros/s/AKfycbw15mtbx4dLzZoRTwgpDSIJ02_UnBV49ylC3cGUJBO43WrK6gmZkBiHNRWNcqampi4V1A/exec";
+    const urlScript = "https://script.google.com/macros/s/AKfycbyldggQ00mt1ilNqf3MZ16YmqTd9eYuWEeZsHjLllXa18iHt0Gd6QKf9SfBaXfGqwqyZA/exec";
     let todosOsPostes = [];
     let paginaAtual = 1;
     const itensPorPagina = 100;
@@ -380,9 +390,14 @@ function filtrarPostes() {
     tr.innerHTML = `
       <td><span>${p.dataLancamento || ''}</span></td>
       <td><input type="text" value="${p.idProjeto || ''}" disabled></td>
-      <td><input type="text" value="${p.codigoPoste || ''}" readonly></td>
-      <td><input type="text" value="${p.estruturaPrimaria || ''}" disabled></td>
+<td>
+  <input type="text" value="${p.codigoPoste || ''}" disabled>
+  <input type="hidden" class="codigoAntigo" value="${p.codigoPoste || ''}">
+</td>
+
+
       <td><input type="text" value="${p.postePrimario || ''}" disabled></td>
+      <td><input type="text" value="${p.estruturaPrimaria || ''}" disabled></td>
       <td><input type="text" value="${p.posteSecundario || ''}" disabled></td>
       <td><input type="text" value="${p.estruturaSecundaria || ''}" disabled></td>
       <td><textarea disabled>${p.linhaViva || ''}</textarea></td> <!-- ✅ ALTERADO -->
@@ -392,8 +407,8 @@ function filtrarPostes() {
       <td><a href="${p.caminhoFoto2}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto2)}" alt="Foto2"></a></td>
      <td><a href="${p.caminhoFoto3}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto3)}" alt="Foto3"></a></td>
 
-      <td><input type="text" value="${p.latitude || ''}" disabled></td>
-      <td><input type="text" value="${p.longitude || ''}" disabled></td>
+      <td><input type="text" value="${p.latitude || ''}" readonly></td>
+      <td><input type="text" value="${p.longitude || ''}" readonly></td>
       <td><input type="text" value="${p.usuario || ''}" readonly></td>
       <td>
         <select disabled>
@@ -464,7 +479,7 @@ const dataAtual = agora.toLocaleDateString('pt-BR');
 
 // ✅ Mensagem final exibida
 const mensagem = `📊 ${totalProjetos} projetos | 🔢 ${totalPostes} postes | ✅ ${concluidos} concluídos | 🔧 ${andamento} em andamento | 🌿 ${comPodas} postes com poda | 🕳️ ${podasPendentes} podas pendentes` +
-  (totalPodasFormatado ? ` | 💰 Total pendente podas: ${totalPodasFormatado}` : '') +
+  (totalPodasFormatado ? ` | 💰 Total pendente: ${totalPodasFormatado}` : '') +
   ` | 🕒 Atualizado em: ${dataAtual} às ${horaAtual}`;
 
 // ✅ Exibir no HTML
@@ -475,58 +490,96 @@ document.getElementById("contadorStatus").innerText = mensagem;
 }
 
 
-  function editar(botao) {
+
+function editar(botao) {
   const tr = botao.closest("tr");
-  const inputs = tr.querySelectorAll("input:not([readonly]), textarea, select");
   const estaEditando = botao.textContent === "Salvar";
 
   if (estaEditando) {
     salvar(tr);
     botao.textContent = "Editar";
-    inputs.forEach(input => input.disabled = true);
+
+    // Após salvar, trava tudo novamente
+    tr.querySelectorAll("input, textarea, select").forEach(el => {
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+        el.disabled = true;
+        el.readOnly = true;
+      } else if (el.tagName === "SELECT") {
+        el.disabled = true;
+      }
+    });
+
   } else {
     botao.textContent = "Salvar";
-    inputs.forEach(input => {
-      // Protege usuário e dataLancamento contra edição
-      const colIndex = Array.from(tr.children).indexOf(input.closest("td"));
-      if (colIndex !== 0 && colIndex !== 15) {
-        input.disabled = false;
+
+    tr.querySelectorAll("input, textarea, select").forEach(el => {
+      const td = el.closest("td");
+      if (!td) return;
+
+      const colIndex = Array.from(tr.children).indexOf(td);
+
+      // Liberar tudo, exceto data/hora (coluna 0) e usuário (coluna 15)
+      const colunasBloqueadas = [0, 15];
+
+      if (!colunasBloqueadas.includes(colIndex)) {
+        if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+          el.disabled = false;
+          el.readOnly = false;
+        } else if (el.tagName === "SELECT") {
+          el.disabled = false;
+        }
       }
     });
   }
 }
+
+
 
 function corrigirImagemURL(url) {
   if (!url) return "";
   const id = url.match(/[-\w]{25,}/); // ID de 25+ caracteres
   return id ? `https://drive.google.com/uc?id=${id[0]}` : url;
 }
-
 async function salvar(tr) {
   const botaoSalvar = tr.querySelector('button');
   botaoSalvar.disabled = true;
   botaoSalvar.textContent = 'Salvando...';
 
+  const codigoPoste = tr.children[2].querySelector("input").value.trim();
+
+  if (!codigoPoste) {
+    alert("❌ Código do poste não pode estar vazio.");
+    botaoSalvar.disabled = false;
+    botaoSalvar.textContent = 'Salvar';
+    return;
+  }
+
+
+const codigoPosteInput = tr.children[2].querySelector("input[type='text']").value.trim();
+const codigoPosteAntigo = tr.children[2].querySelector("input.codigoAntigo")?.value.trim();
+
   const dados = {
     dataLancamento: tr.children[0]?.querySelector("span")?.innerText || "",
-    idProjeto: tr.children[1].querySelector("input").value,
-    codigoPoste: tr.children[2].querySelector("input").value,
-    estruturaPrimaria: tr.children[3].querySelector("input").value,
-    postePrimario: tr.children[4].querySelector("input").value,
-    posteSecundario: tr.children[5].querySelector("input").value,
-    estruturaSecundaria: tr.children[6].querySelector("input").value,
-    linhaViva: tr.children[7].querySelector("textarea").value,         // ✅ Linha Viva
-    servicosPodas: tr.children[8].querySelector("textarea").value,     // ✅ Podas
-    observacoes: tr.children[9].querySelector("textarea").value,       // ✅ Observações
+    idProjeto: tr.children[1].querySelector("input").value.trim(),
+    //codigoPoste: codigoPoste, // reforçado aqui
+    codigoPoste: codigoPosteInput,
+   codigoPosteAntigo: codigoPosteAntigo || codigoPosteInput,
+
+    estruturaPrimaria: tr.children[3].querySelector("input").value.trim(),
+    postePrimario: tr.children[4].querySelector("input").value.trim(),
+    posteSecundario: tr.children[5].querySelector("input").value.trim(),
+    estruturaSecundaria: tr.children[6].querySelector("input").value.trim(),
+    linhaViva: tr.children[7].querySelector("textarea").value.trim(),
+    servicosPodas: tr.children[8].querySelector("textarea").value.trim(),
+    observacoes: tr.children[9].querySelector("textarea").value.trim(),
     caminhoFoto: corrigirImagemURL(tr.children[10].querySelector("a")?.href || ""),
     caminhoFoto2: corrigirImagemURL(tr.children[11].querySelector("a")?.href || ""),
     caminhoFoto3: corrigirImagemURL(tr.children[12].querySelector("a")?.href || ""),
-    latitude: tr.children[13].querySelector("input").value,
-    longitude: tr.children[14].querySelector("input").value,
-    usuario: tr.children[15].querySelector("input").value,
+    latitude: tr.children[13].querySelector("input").value.trim(),
+    longitude: tr.children[14].querySelector("input").value.trim(),
+    usuario: tr.children[15].querySelector("input").value.trim(),
     status: tr.children[16].querySelector("select").value
   };
-
 
   try {
     const resposta = await fetch(urlScript, {
@@ -550,6 +603,7 @@ async function salvar(tr) {
   botaoSalvar.disabled = false;
   botaoSalvar.textContent = 'Salvar';
 }
+
 
 async function excluir(botao) {
   const tr = botao.closest("tr");
@@ -740,23 +794,24 @@ function corrigirImagemURL(url) {
     map.fitBounds(bounds);
   }
 }
+
+
+
 function exportarCSV(tudo = false) {
-const headers = [
-  "Data/Hora", "ID Projeto", "Poste", "Estrutura Primária", "Poste Primário",
-  "Poste Secundário", "Estrutura Secundária", "Linha Viva", "Serviços Podas", // ✅
-  "Observações", "Imagem 1 (URL)", "Imagem 2 (URL)", "Imagem 3 (URL)",
-  "Latitude", "Longitude", "Usuário", "Status"
-];
+  const headers = [
+    "Data/Hora", "ID Projeto", "PG", "Poste Primário", "Estrutura Primária",
+    "Poste Secundário", "Estrutura Secundária", "Linha Viva", "Serviços Podas",
+    "Observações", "Imagem 1 (URL)", "Imagem 2 (URL)", "Imagem 3 (URL)",
+    "Latitude", "Longitude", "Usuário", "Status"
+  ];
 
   const linhas = [headers];
 
   let dadosParaExportar = [];
 
   if (tudo) {
-    // Exporta todos os postes carregados no filtro (todosOsPostes global)
     dadosParaExportar = todosOsPostes;
   } else {
-    // Exporta somente os exibidos na tabela atual (paginada)
     const linhasTabela = document.querySelectorAll("#tabelaPostes tbody tr");
 
     linhasTabela.forEach(tr => {
@@ -767,13 +822,13 @@ const headers = [
         dataFormatada,
         tr.children[1]?.querySelector("input")?.value || "",
         tr.children[2]?.querySelector("input")?.value || "",
-        tr.children[3]?.querySelector("input")?.value || "",
-        tr.children[4]?.querySelector("input")?.value || "",
+        tr.children[4]?.querySelector("input")?.value || "", // Poste Primário (nova posição)
+        tr.children[3]?.querySelector("input")?.value || "", // Estrutura Primária (nova posição)
         tr.children[5]?.querySelector("input")?.value || "",
         tr.children[6]?.querySelector("input")?.value || "",
         tr.children[7]?.querySelector("input")?.value || "",
         tr.children[8]?.querySelector("textarea")?.value || "",
-        tr.children[9]?.querySelector("textarea")?.value || "", // ✅ Serviços Podas
+        tr.children[9]?.querySelector("textarea")?.value || "",
         tr.children[10]?.querySelector("a")?.href || "",
         tr.children[11]?.querySelector("a")?.href || "",
         tr.children[12]?.querySelector("input")?.value || "",
@@ -787,19 +842,18 @@ const headers = [
     });
   }
 
-  // Se for exportar tudo, monta direto do JSON original
   if (tudo) {
     dadosParaExportar.forEach(p => {
       const linha = [
         formatarDataBR(p.dataLancamento),
         p.idProjeto || "",
         p.codigoPoste || "",
-        p.estruturaPrimaria || "",
-        p.postePrimario || "",
+        p.postePrimario || "",       // Poste Primário na frente
+        p.estruturaPrimaria || "",   // Estrutura Primária depois
         p.posteSecundario || "",
         p.estruturaSecundaria || "",
         p.linhaViva || "",
-        p.servicosPodas || "", // ✅ Aqui
+        p.servicosPodas || "",
         p.observacoes || "",
         p.caminhoFoto || "",
         p.caminhoFoto2 || "",
@@ -824,6 +878,7 @@ const headers = [
   link.click();
   document.body.removeChild(link);
 }
+
 
 function formatarDataBR(dataISO) {
   if (!dataISO || !dataISO.includes('T')) return dataISO;

@@ -14,7 +14,7 @@ body {
 }
 
 .container {
-  max-width: 1400px;
+  max-width: 1800px;
   margin: auto;
   background: #ffffff;
   padding: 24px;
@@ -413,18 +413,14 @@ body {
   border-bottom: 1px solid #cccccc;
 }
 
-
-
-#tabelaPostes {
-  border-collapse: collapse;
+td input {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  border-radius: 0;
+  padding: 4px 6px;
   width: 100%;
+  font-size: 13px;
 }
-
-#tabelaPostes td, #tabelaPostes th {
-  border: 1px solid #e0e0e0;
-}
-
-
 
 
 
