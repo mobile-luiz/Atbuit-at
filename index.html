@@ -96,6 +96,7 @@
             <th>Poste Secundário</th>
             <th>Estrutura Secundária</th>
             <th>Linha Viva</th> <!-- ✅ Novo -->
+            <th>Serviços Podas</th>
             <th>Observações</th>
             <th>Imagem 1</th>
             <th>Imagem 2</th>
@@ -174,7 +175,7 @@
   }
 
   async function carregarPostes() {
-    const urlDados = "https://script.google.com/macros/s/AKfycbxdIti6xMCwFpFdKcQfuvPh38-fwV4z8srdkmpZ5S15WiCRm_r4kn6dT9T0gl0kCvA5Pg/exec";
+    const urlDados = "https://script.google.com/macros/s/AKfycbw15mtbx4dLzZoRTwgpDSIJ02_UnBV49ylC3cGUJBO43WrK6gmZkBiHNRWNcqampi4V1A/exec";
     const usuarioLogado = (localStorage.getItem("usuarioLogado") || "").trim().toLowerCase();
     const perfilLogado = (localStorage.getItem("perfilLogado") || "").trim().toLowerCase();
 
@@ -210,6 +211,7 @@
         <td>${p.posteSecundario || ""}</td>
         <td>${p.estruturaSecundaria || ""}</td>
         <td>${p.linhaViva || ""}</td>
+        <td>${p.servicosPodas || ""}</td> <!-- ✅ Campo adicionado -->
         <td>${p.observacoes || ""}</td>
         <td>${p.imagem || ""}</td>
         <td>${p.imagem2 || ""}</td>
@@ -236,7 +238,7 @@
 
 
   <script>
-    const urlScript = "https://script.google.com/macros/s/AKfycbxdIti6xMCwFpFdKcQfuvPh38-fwV4z8srdkmpZ5S15WiCRm_r4kn6dT9T0gl0kCvA5Pg/exec";
+    const urlScript = "https://script.google.com/macros/s/AKfycbw15mtbx4dLzZoRTwgpDSIJ02_UnBV49ylC3cGUJBO43WrK6gmZkBiHNRWNcqampi4V1A/exec";
     let todosOsPostes = [];
     let paginaAtual = 1;
     const itensPorPagina = 50;
@@ -360,8 +362,6 @@ function filtrarPostes() {
     }
 
 
-
-
    function exibirPostes(lista) {
   const tbody = document.querySelector("#tabelaPostes tbody");
   tbody.innerHTML = "";
@@ -378,6 +378,7 @@ function filtrarPostes() {
       <td><input type="text" value="${p.posteSecundario || ''}" disabled></td>
       <td><input type="text" value="${p.estruturaSecundaria || ''}" disabled></td>
       <td><textarea disabled>${p.linhaViva || ''}</textarea></td> <!-- ✅ ALTERADO -->
+        <td><textarea disabled>${p.servicosPodas || ''}</textarea></td> <!-- ✅ NOVO -->
       <td><textarea disabled>${p.observacoes || ''}</textarea></td>
       <td><a href="${p.caminhoFoto}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto)}" alt="Foto"></a></td>
       <td><a href="${p.caminhoFoto2}" target="_blank"><img src="${corrigirImagemURL(p.caminhoFoto2)}" alt="Foto2"></a></td>
@@ -420,19 +421,27 @@ document.getElementById("contadorStatus").innerText = mensagem;
 }
 
 
-    function editar(botao) {
-      const tr = botao.closest("tr");
-      const inputs = tr.querySelectorAll("input:not([readonly]), textarea, select");
-      const estaEditando = botao.textContent === "Salvar";
-      if (estaEditando) {
-        salvar(tr);
-        botao.textContent = "Editar";
-        inputs.forEach(input => input.disabled = true);
-      } else {
-        botao.textContent = "Salvar";
-        inputs.forEach(input => input.disabled = false);
+  function editar(botao) {
+  const tr = botao.closest("tr");
+  const inputs = tr.querySelectorAll("input:not([readonly]), textarea, select");
+  const estaEditando = botao.textContent === "Salvar";
+
+  if (estaEditando) {
+    salvar(tr);
+    botao.textContent = "Editar";
+    inputs.forEach(input => input.disabled = true);
+  } else {
+    botao.textContent = "Salvar";
+    inputs.forEach(input => {
+      // Protege usuário e dataLancamento contra edição
+      const colIndex = Array.from(tr.children).indexOf(input.closest("td"));
+      if (colIndex !== 0 && colIndex !== 15) {
+        input.disabled = false;
       }
-    }
+    });
+  }
+}
+
 function corrigirImagemURL(url) {
   if (!url) return "";
   const id = url.match(/[-\w]{25,}/); // ID de 25+ caracteres
@@ -440,29 +449,30 @@ function corrigirImagemURL(url) {
 }
 
 async function salvar(tr) {
-  const botaoSalvar = tr.querySelector('button'); // Pega botão do <tr>
-
+  const botaoSalvar = tr.querySelector('button');
   botaoSalvar.disabled = true;
   botaoSalvar.textContent = 'Salvando...';
 
-const dados = {
-  dataLancamento: tr.children[0]?.querySelector("span")?.innerText || "",
-  idProjeto: tr.children[1].querySelector("input").value,
-  codigoPoste: tr.children[2].querySelector("input").value,
-  estruturaPrimaria: tr.children[3].querySelector("input").value,
-  postePrimario: tr.children[4].querySelector("input").value,
-  posteSecundario: tr.children[5].querySelector("input").value,
-  estruturaSecundaria: tr.children[6].querySelector("input").value,
-  linhaViva: tr.children[7].querySelector("input").value,
-  observacoes: tr.children[8].querySelector("textarea").value,
-  caminhoFoto: corrigirImagemURL(tr.children[9].querySelector("a")?.href || ""),
-  caminhoFoto2: corrigirImagemURL(tr.children[10].querySelector("a")?.href || ""),
-  caminhoFoto3: corrigirImagemURL(tr.children[11].querySelector("a")?.href || ""),
-  latitude: tr.children[12].querySelector("input").value,
-  longitude: tr.children[13].querySelector("input").value,
-  usuario: tr.children[14].querySelector("input").value,
-  status: tr.children[15].querySelector("select").value
-};
+  const dados = {
+    dataLancamento: tr.children[0]?.querySelector("span")?.innerText || "",
+    idProjeto: tr.children[1].querySelector("input").value,
+    codigoPoste: tr.children[2].querySelector("input").value,
+    estruturaPrimaria: tr.children[3].querySelector("input").value,
+    postePrimario: tr.children[4].querySelector("input").value,
+    posteSecundario: tr.children[5].querySelector("input").value,
+    estruturaSecundaria: tr.children[6].querySelector("input").value,
+    linhaViva: tr.children[7].querySelector("textarea").value,         // ✅ Linha Viva
+    servicosPodas: tr.children[8].querySelector("textarea").value,     // ✅ Podas
+    observacoes: tr.children[9].querySelector("textarea").value,       // ✅ Observações
+    caminhoFoto: corrigirImagemURL(tr.children[10].querySelector("a")?.href || ""),
+    caminhoFoto2: corrigirImagemURL(tr.children[11].querySelector("a")?.href || ""),
+    caminhoFoto3: corrigirImagemURL(tr.children[12].querySelector("a")?.href || ""),
+    latitude: tr.children[13].querySelector("input").value,
+    longitude: tr.children[14].querySelector("input").value,
+    usuario: tr.children[15].querySelector("input").value,
+    status: tr.children[16].querySelector("select").value
+  };
+
 
   try {
     const resposta = await fetch(urlScript, {
@@ -515,6 +525,7 @@ async function excluir(botao) {
   botao.disabled = false;
   botao.textContent = 'Excluir';
 }
+
 
 
 
@@ -579,6 +590,7 @@ const info = new google.maps.InfoWindow({
         <div>🔗 <b>Poste Secundário:</b> ${p.posteSecundario || '-'}</div>
         <div>⚙️ <b>Estrutura Secundária:</b> ${p.estruturaSecundaria || '-'}</div>
         <div>⚡ <b>Linha Viva:</b> ${p.linhaViva || '-'}</div>
+        <div>🌿 <b>Serviços Podas:</b> ${p.servicosPodas || '-'}</div>
         <div>📡 <b>Lat/Lon:</b> ${p.latitude || '-'}, ${p.longitude || '-'}</div>
         <div>🟢 <b>Status:</b> <span style="color:${p.status === 'Concluído' ? '#2e7d32' : '#ff9800'};">${p.status || 'Em andamento'}</span></div>
         <div>👤 <b>Usuário:</b> ${p.usuario || '-'}</div>
@@ -653,12 +665,13 @@ function corrigirImagemURL(url) {
   }
 }
 function exportarCSV(tudo = false) {
-  const headers = [
-    "Data/Hora", "ID Projeto", "Poste", "Estrutura Primária", "Poste Primário",
-    "Poste Secundário", "Estrutura Secundária", "Linha Viva", "Observações",
-    "Imagem 1 (URL)", "Imagem 2 (URL)", "Imagem 3 (URL)",
-    "Latitude", "Longitude", "Usuário", "Status"
-  ];
+const headers = [
+  "Data/Hora", "ID Projeto", "Poste", "Estrutura Primária", "Poste Primário",
+  "Poste Secundário", "Estrutura Secundária", "Linha Viva", "Serviços Podas", // ✅
+  "Observações", "Imagem 1 (URL)", "Imagem 2 (URL)", "Imagem 3 (URL)",
+  "Latitude", "Longitude", "Usuário", "Status"
+];
+
   const linhas = [headers];
 
   let dadosParaExportar = [];
@@ -684,13 +697,14 @@ function exportarCSV(tudo = false) {
         tr.children[6]?.querySelector("input")?.value || "",
         tr.children[7]?.querySelector("input")?.value || "",
         tr.children[8]?.querySelector("textarea")?.value || "",
-        tr.children[9]?.querySelector("a")?.href || "",
+        tr.children[9]?.querySelector("textarea")?.value || "", // ✅ Serviços Podas
         tr.children[10]?.querySelector("a")?.href || "",
-        tr.children[11]?.querySelector("input")?.value || "",
+        tr.children[11]?.querySelector("a")?.href || "",
         tr.children[12]?.querySelector("input")?.value || "",
         tr.children[13]?.querySelector("input")?.value || "",
         tr.children[14]?.querySelector("input")?.value || "",
-        tr.children[15]?.querySelector("select")?.value || ""
+        tr.children[15]?.querySelector("input")?.value || "",
+        tr.children[16]?.querySelector("select")?.value || ""
       ];
 
       linhas.push(linha);
@@ -709,6 +723,7 @@ function exportarCSV(tudo = false) {
         p.posteSecundario || "",
         p.estruturaSecundaria || "",
         p.linhaViva || "",
+        p.servicosPodas || "", // ✅ Aqui
         p.observacoes || "",
         p.caminhoFoto || "",
         p.caminhoFoto2 || "",
