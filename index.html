@@ -409,26 +409,66 @@ function filtrarPostes() {
     tbody.appendChild(tr);
   });
 
-// ✅ Estatísticas
+
+ // ✅ Função: Somar valores das podas pendentes
+function somarValorPodasPendentes(lista) {
+  let total = 0;
+
+  lista.forEach(p => {
+    const status = (p.status || "").toLowerCase().trim();
+    const podas = (p.servicosPodas || "").toLowerCase().trim();
+
+    if (status !== "concluído" && podas !== "" && podas !== "não recebido") {
+      const matches = podas.match(/r\$ ?[\d.,]+/gi);
+      if (matches) {
+        matches.forEach(valor => {
+          const limpo = valor.replace(/[^\d,]/g, '').replace(',', '.');
+          total += parseFloat(limpo) || 0;
+        });
+      }
+    }
+  });
+
+  return total;
+}
+
+// ✅ Dados para estatísticas
 const totalPostes = lista.length;
 const totalProjetos = new Set(lista.map(p => p.idProjeto)).size;
-const concluidos = lista.filter(p => p.status === "Concluído").length;
-const andamento = lista.filter(p => p.status === "Em andamento").length;
+const concluidos = lista.filter(p => (p.status || "").trim().toLowerCase() === "concluído").length;
+const andamento = lista.filter(p => (p.status || "").trim().toLowerCase() === "em andamento").length;
 
-// ✅ Contar quantos têm serviços de podas preenchido
+// ✅ Podas preenchidas
 const comPodas = lista.filter(p => {
   const podas = (p.servicosPodas || "").trim().toLowerCase();
   return podas !== "" && podas !== "não recebido";
 }).length;
 
+// ✅ Podas pendentes
+const podasPendentes = lista.filter(p => {
+  const podas = (p.servicosPodas || "").trim().toLowerCase();
+  const status = (p.status || "").trim().toLowerCase();
+  return podas !== "" && podas !== "não recebido" && status !== "concluído";
+}).length;
+
+// ✅ Soma total das podas pendentes
+const totalPodasPendentes = somarValorPodasPendentes(lista);
+const totalPodasFormatado = totalPodasPendentes > 0
+  ? totalPodasPendentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  : null;
+
+// ✅ Horário atual formatado
 const agora = new Date();
 const horaAtual = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 const dataAtual = agora.toLocaleDateString('pt-BR');
 
-const mensagem = `📊 ${totalProjetos} projetos | 🔢 ${totalPostes} postes | ✅ ${concluidos} concluídos | 🔧 ${andamento} em andamento | 🌿 ${comPodas} postes com podas | ${andamento > 0 ? '⏳ Ainda há postes para concluir.' : '🎉 Todos os postes foram concluídos!'} | 🕒 Atualizado em: ${dataAtual} às ${horaAtual}`;
+// ✅ Mensagem final exibida
+const mensagem = `📊 ${totalProjetos} projetos | 🔢 ${totalPostes} postes | ✅ ${concluidos} concluídos | 🔧 ${andamento} em andamento | 🌿 ${comPodas} postes com poda | 🕳️ ${podasPendentes} podas pendentes` +
+  (totalPodasFormatado ? ` | 💰 Total pendente podas: ${totalPodasFormatado}` : '') +
+  ` | 🕒 Atualizado em: ${dataAtual} às ${horaAtual}`;
 
+// ✅ Exibir no HTML
 document.getElementById("contadorStatus").innerText = mensagem;
-
 
 
   mostrarMapa(lista);
