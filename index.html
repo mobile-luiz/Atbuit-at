@@ -2,149 +2,131 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Atbuilt - Gestão de Postes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atbuilt - Sistema de Gestão de Postes</title>
+
+  <!-- Bibliotecas de PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <!-- lembre de incluir html2canvas e html2pdf: -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- CSS externo -->
   <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
-
-
-<!-- Tela de Login -->
-<div id="loginContainer" class="login-container">
-  <div class="login-box">
-    <h2>Login</h2>
-    <input type="text" id="loginEmail" placeholder="E-mail ou Usuário">
-    <input type="password" id="loginSenha" placeholder="Senha">
-    <button onclick="fazerLogin()">Entrar</button>
-    <div id="loginErro" class="login-erro"></div>
-
-    <!-- 🔽 Nome do sistema e logo abaixo do botão -->
-    <div style="margin-top: 30px; display: flex; flex-direction: column; align-items: center;">
-      <img src="logo-atbuilt.png" alt="Logo Atbuilt" style="height: 50px; margin-bottom: 8px;">
-      <h3 style="margin: 0; font-size: 16px; color: #1a202c;">Atbuilt - Sistema de Gestão </h3>
+  <!-- Tela de Login -->
+  <div id="loginContainer" class="login-container">
+    <div class="login-box">
+      <h2>Login</h2>
+      <input type="text" id="loginEmail" placeholder="E-mail ou Usuário">
+      <input type="password" id="loginSenha" placeholder="Senha">
+      <button onclick="fazerLogin()">Entrar</button>
+      <div id="loginErro" class="login-erro"></div>
+      <div style="margin-top:30px; text-align:center;">
+        <img src="logo-atbuilt.png" alt="Logo" style="height:50px; margin-bottom:8px;">
+        <h3 style="font-size:16px; color:#1a202c;">Atbuilt - Sistema de Gestão</h3>
+      </div>
     </div>
   </div>
-</div>
 
+  <!-- Tela do Sistema (oculta até login) -->
+  <div id="sistemaContainer" class="sistema-container" style="display:none;">
+    <div class="container">
 
+      <h2>Atbuilt - Sistema de Gestão de Postes</h2>
 
-<!-- Tela do Sistema (oculta até login) -->
-<div id="sistemaContainer" class="sistema-container" style="display: none;">
-  <div class="container">
-    <h2>Atbuilt - Sistema de Gestão de Postes</h2>
-    
-    <div class="header">
-      <div>
-        <label for="usuario">E-mail do usuário</label>
-        <input type="text" id="usuario" placeholder="ex: usuario@email.com" oninput="filtrarPostes()">
+      <!-- Header de filtros melhorado com CSS Grid -->
+      <div class="header">
+        <div>
+          <label for="usuario">E-mail do usuário</label>
+          <input type="text" id="usuario" placeholder="ex: usuario@email.com" 
+                 oninput="filtrarPostes()">
+        </div>
+        <div>
+          <label for="filtroProjeto">ID do Projeto</label>
+          <select id="filtroProjeto" onchange="filtrarPostes()">
+            <option value="">Todos</option>
+            <!-- ... opções dinamicamente preenchidas ... -->
+          </select>
+        </div>
+        <div>
+          <label for="filtroPoste">Código do Poste</label>
+          <input type="text" id="filtroPoste" placeholder="ex: 9/400(E780518)" 
+                 oninput="filtrarPostes()">
+        </div>
+        <div>
+          <label for="filtroStatus">Status</label>
+          <select id="filtroStatus" onchange="filtrarPostes()">
+            <option value="">Todos</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Concluído">Concluído</option>
+          </select>
+        </div>
+        <div>
+          <label for="dataInicial">De:</label>
+          <input type="date" id="dataInicial" onchange="filtrarPostes()">
+        </div>
+        <div>
+          <label for="dataFinal">Até:</label>
+          <input type="date" id="dataFinal" onchange="filtrarPostes()">
+        </div>
+        <div>
+          
+        </div>
       </div>
 
-      <div>
-        <label for="filtroProjeto">ID do Projeto</label>
-        <select id="filtroProjeto" onchange="filtrarPostes()">
-          <option value="">Todos</option>
-        </select>
+      <!-- Barra de ações -->
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+        <button onclick="exportarCSV(false)">📥 Baixar Página</button>
+        <button onclick="exportarCSV(true)">📥 Baixar Tudo</button>
+        <button onclick="baixarPDF()">📄 Baixar PDF</button>
+        <button id="btnMostrarPodas" style="background:#388E3C;">🌿 Mostrar Podas</button>
       </div>
 
-      <div>
-        <label for="filtroPoste">Código do Poste</label>
-        <input type="text" id="filtroPoste" placeholder="ex: 9/400(E780518)" oninput="filtrarPostes()">
+      <!-- Contador de status -->
+      <div id="contadorStatus"></div>
+
+      <!-- Paginação -->
+      <div id="paginacao"></div>
+
+      <!-- Tabela de dados -->
+      <div class="scroll-table">
+        <table id="tabelaPostes">
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>ID Projeto</th>
+              <th>PG</th>
+              <th>Poste Primário</th>
+              <th>Estrutura Primária</th>
+              <th>Poste Secundário</th>
+              <th>Estrutura Secundária</th>
+              <th>Linha Viva</th>
+              <th>Serviços Podas</th>
+              <th>Observações</th>
+              <th>Imagem 1</th>
+              <th>Imagem 2</th>
+              <th>Imagem 3</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+              <th>Usuário</th>
+              <th>Status</th>
+              <th>Editar</th>
+              <th>Excluir</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-         <div>
-  <label for="filtroStatus">Status</label>
-  <select id="filtroStatus" onchange="filtrarPostes()">
-    <option value="">Todos</option>
-    <option value="Em andamento">Em andamento</option>
-    <option value="Concluído">Concluído</option>
-  </select>
-</div> 
+      <!-- Mapa de postes -->
+      <h3>📍 Mapa dos Postes</h3>
+      <div id="map"></div>
 
-      <div>
-        <label for="dataInicial">De:</label>
-        <input type="date" id="dataInicial" onchange="filtrarPostes()">
-      </div>
-
-      <div>
-        <label for="dataFinal">Até:</label>
-        <input type="date" id="dataFinal" onchange="filtrarPostes()">
-      </div>
-
-      <div>
-        <button onclick="filtrarPostes()">Filtrar</button>
-      </div>
     </div>
-
- 
-
-    <div style="margin-bottom: 12px;">
-     
-  <!-- 📦 Barra de botões -->
-<div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 6px;">
-  <button onclick="exportarCSV(false)">📥 Baixar Página</button>
-  <button onclick="exportarCSV(true)">📥 Baixar Tudo</button>
-  
-  <button id="btnMostrarPodas" style="
-    background-color: #388E3C; color: white; padding: 10px 16px;
-    border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
-    🌿 Mostrar Podas
-  </button>
-</div>
-
-
-  <div id="contadorStatus" style="
-    margin-top: 6px;
-    background: #d1f0ea;
-    padding: 10px 16px;
-    border-radius: 8px;
-    color: #064e3b;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    max-width: 100%;
-    overflow: hidden;
-  "></div>
-</section>
-
-
-    <div id="paginacao" style="margin: 12px 0;"></div>
-
-    <div class="scroll-table">
-      <div class="barra-container">
-</div>
-      <table id="tabelaPostes">
-        <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>ID Projeto</th>
-            <th>PG</th>
-            <th>Poste Primário</th>
-            <th>Estrutura Primária</th>
-            <th>Poste Secundário</th>
-            <th>Estrutura Secundária</th>
-            <th>Linha Viva</th> <!-- ✅ Novo -->
-            <th>Serviços Podas</th>
-            <th>Observações</th>
-            <th>Imagem 1</th>
-            <th>Imagem 2</th>
-            <th>Imagem 3</th>
-            <th>Latitude</th>
-            <th>Longitude</th>
-            <th>Usuário</th>
-            <th>Status</th>
-            <th>Editar</th>
-            <th>Excluir</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-   <h3>📍 Mapa dos Postes</h3>
-<div id="map" style="width: 100%; height: 400px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
-
-  </div>
 
 <script>
   let timeoutInatividade;
@@ -204,7 +186,7 @@
   }
 
   async function carregarPostes() {
-    const urlDados = "https://script.google.com/macros/s/AKfycbyldggQ00mt1ilNqf3MZ16YmqTd9eYuWEeZsHjLllXa18iHt0Gd6QKf9SfBaXfGqwqyZA/exec";
+    const urlDados = "https://script.google.com/macros/s/AKfycbyf5RhvLSW2k5cdf5_Y0772xpCylh1Ygx1j4mXp59r_mb46XC1WmfnSSPcJbjnSdosv/exec";
     const usuarioLogado = (localStorage.getItem("usuarioLogado") || "").trim().toLowerCase();
     const perfilLogado = (localStorage.getItem("perfilLogado") || "").trim().toLowerCase();
 
@@ -225,36 +207,37 @@
     }
   }
 
-  function exibirTabela(dados) {
-    const tbody = document.querySelector("#tabelaPostes tbody");
-    tbody.innerHTML = "";
+ function exibirTabela(dados) {
+  const tbody = document.querySelector("#tabelaPostes tbody");
+  tbody.innerHTML = "";
 
-    dados.forEach(p => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${p.dataHora || ""}</td>
-        <td>${p.idProjeto || ""}</td>
-        <td>${p.codigoPoste || ""}</td>
-        <td>${p.postePrimario || ""}</td>
-        <td>${p.estruturaPrimaria || ""}</td>
-        <td>${p.posteSecundario || ""}</td>
-        <td>${p.estruturaSecundaria || ""}</td>
-        <td>${p.linhaViva || ""}</td>
-        <td>${p.servicosPodas || ""}</td> <!-- ✅ Campo adicionado -->
-        <td>${p.observacoes || ""}</td>
-        <td>${p.imagem || ""}</td>
-        <td>${p.imagem2 || ""}</td>
-        <td>${p.imagem3 || ""}</td>
-        <td>${p.latitude || ""}</td>
-        <td>${p.longitude || ""}</td>
-        <td>${p.usuario || ""}</td>
-        <td>${p.status || ""}</td>
-        <td><button>Editar</button></td>
-        <td><button>Excluir</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+  dados.forEach(p => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.dataHora || ""}</td>
+      <td>${p.idProjeto || ""}</td>
+      <td>${p.codigoPoste || ""}</td>
+      <td>${p.postePrimario || ""}</td>
+      <td>${p.estruturaPrimaria || ""}</td>
+      <td>${p.posteSecundario || ""}</td>
+      <td>${p.estruturaSecundaria || ""}</td>
+      <td>${p.linhaViva || ""}</td>
+      <td>${p.servicosPodas || ""}</td>
+      <td>${p.observacoes || ""}</td>
+      <td>${p.imagem ? `<img src="${corrigirImagemURL(p.imagem)}" style="width:60px;height:60px;object-fit:cover;">` : ""}</td>
+      <td>${p.imagem2 ? `<img src="${corrigirImagemURL(p.imagem2)}" style="width:60px;height:60px;object-fit:cover;">` : ""}</td>
+      <td>${p.imagem3 ? `<img src="${corrigirImagemURL(p.imagem3)}" style="width:60px;height:60px;object-fit:cover;">` : ""}</td>
+      <td>${p.latitude || ""}</td>
+      <td>${p.longitude || ""}</td>
+      <td>${p.usuario || ""}</td>
+      <td>${p.status || ""}</td>
+      <td><button>Editar</button></td>
+      <td><button>Excluir</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 
   window.onload = () => {
     const usuario = localStorage.getItem("usuarioLogado");
@@ -355,9 +338,10 @@ function filtrarPostes() {
   const fim = inicio + itensPorPagina;
   const listaPaginada = listaFiltrada.slice(inicio, fim);
 
-  exibirPostes(listaPaginada);
-  mostrarMapa(listaPaginada);
-  atualizarPaginacao(totalPaginas);
+listaVisivel = listaPaginada;
+exibirPostes(listaVisivel);
+mostrarMapa(listaVisivel);
+atualizarPaginacao(totalPaginas);
 }
 
 
@@ -961,9 +945,25 @@ function mostrarAvisoAtualizacao() {
 
 
 window.onload = () => {
-  carregarPostes();  // Primeira carga normal
-  setInterval(verificarAtualizacoes, 15000);  // Verifica a cada 15s
+  const sistemaContainer = document.getElementById("sistemaContainer");
+
+  // Carrega os dados assim que a página for aberta
+  if (typeof carregarPostes === "function") {
+    carregarPostes();
+  }
+
+  // Verifica atualizações a cada 30 segundos (só se sistema visível)
+  setInterval(() => {
+    if (
+      sistemaContainer &&
+      sistemaContainer.style.display !== "none" &&
+      typeof verificarAtualizacoes === "function"
+    ) {
+      verificarAtualizacoes();
+    }
+  }, 60000); // ✅ 60s para performance ideal
 };
+
 
 let mostrandoSomentePodas = false;
 
@@ -996,6 +996,114 @@ btnMostrarPodas.addEventListener("click", () => {
     btnMostrarPodas.style.backgroundColor = "#388E3C"; // Verde
   }
 });
+
+/* ======= Corrigir URLs do Drive (captura ID corretamente) ======= */
+function corrigirImagemURL(url) {
+  // Captura o ID entre "/d/" e antes de "/" ou "?" ou fim de string
+  const match = url.match(/\/d\/([A-Za-z0-9_-]+)(?=\/|\?|$)/);
+  if (match && match[1]) {
+    return `https://docs.google.com/uc?export=view&id=${match[1]}`;
+  }
+  return url;
+}
+
+/* ======= Converte URL em DataURL (evita CORS issues) ======= */
+async function toDataURL(url) {
+  const res = await fetch(url, { mode: 'cors' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/* ======= Geração do PDF com jsPDF e autoTable ======= */
+async function baixarPDF() {
+  console.log('📄 Iniciando geração de PDF...');
+  const docs = (window.listaVisivel && listaVisivel.length) ? listaVisivel : (window.todosOsPostes || []);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 40;
+
+  // 1) Pré-carregar imagens como DataURLs
+  const rawUrls = docs.flatMap(p => [p.caminhoFoto, p.caminhoFoto2, p.caminhoFoto3]);
+  const urls = [...new Set(rawUrls.map(corrigirImagemURL).filter(u => u))];
+  console.log('→ URLs únicas:', urls);
+  const imgMap = {};
+  await Promise.all(urls.map(async u => {
+    try {
+      imgMap[u] = await toDataURL(u);
+      console.log('→ carregou:', u);
+    } catch (err) {
+      console.warn('→ falhou:', u, err);
+    }
+  }));
+
+  // 2) Monta cada página
+  docs.forEach((p, idx) => {
+    if (idx > 0) doc.addPage();
+    let y = margin;
+    // Cabeçalho
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text('Relatório de Postes Atbuilt', pageW / 2, y, { align: 'center' });
+    y += 30;
+
+    // Dados em tabela
+    const usableW = pageW - margin * 2;
+    const col1W = usableW * 0.2;
+    const col2W = usableW - col1W;
+    const rows = [
+      ['N°', String(idx + 1)],
+      ['Data', p.dataLancamento || '-'],
+      ['ID Projeto', p.idProjeto || '-'],
+      ['PG', p.codigoPoste || '-'],
+      ['Poste Primário', p.postePrimario || '-'],
+      ['Estrutura Primária', p.estruturaPrimaria || '-'],
+      ['Poste Secundário', p.posteSecundario || '-'],
+      ['Estrutura Secundária', p.estruturaSecundaria || '-'],
+      ['Linha Viva', p.linhaViva || '-'],
+      ['Podas', p.servicosPodas || '-'],
+      ['Observações', p.observacoes || '-'],
+      ['Lat/Lng', `${p.latitude || '-'}, ${p.longitude || '-'}`],
+      ['Usuário', p.usuario || '-'],
+      ['Status', p.status || '-']
+    ];
+    doc.autoTable({
+      startY: y,
+      theme: 'plain',
+      margin: { left: margin, right: margin },
+      tableWidth: usableW,
+      styles: { fontSize: 11, cellPadding: 2 },
+      columnStyles: { 0: { cellWidth: col1W, fontStyle: 'bold' }, 1: { cellWidth: col2W } },
+      body: rows
+    });
+
+    // Imagens abaixo
+    y = doc.lastAutoTable.finalY + 10;
+    const imgSize = (usableW - 20) / 3;
+    let x = margin;
+    [p.caminhoFoto, p.caminhoFoto2, p.caminhoFoto3].forEach(raw => {
+      const u = corrigirImagemURL(raw);
+      if (imgMap[u]) {
+        doc.addImage(imgMap[u], 'JPEG', x, y, imgSize, imgSize);
+      } else {
+        doc.setDrawColor(200);
+        doc.rect(x, y, imgSize, imgSize);
+      }
+      x += imgSize + 10;
+    });
+  });
+
+  // 3) Salvar arquivo
+  const hoje = new Date().toISOString().slice(0, 10);
+  doc.save(`postes_${hoje}.pdf`);
+  console.log(`✅ PDF salvo: postes_${hoje}.pdf`);
+}
 
 
    // window.onload = () => carregarPostes();
